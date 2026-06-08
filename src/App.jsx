@@ -1045,6 +1045,20 @@ export default function App() {
   const isComponentCompleted = mode === 'component' && componentGroups.length > 0 && placedComps.length === componentGroups.length && !isLoading;
   const isCompleted = isPracticeCompleted || isPuzzleCompleted || isComponentCompleted;
 
+  // --- 新增：用來控制成功動畫顯示 2 秒的狀態與特效 ---
+  const [showSuccessGif, setShowSuccessGif] = useState(false);
+  
+  useEffect(() => {
+    if (isCompleted) {
+      setShowSuccessGif(true);
+      const timer = setTimeout(() => setShowSuccessGif(false), 2000); // 2秒後自動隱藏
+      return () => clearTimeout(timer);
+    } else {
+      setShowSuccessGif(false);
+    }
+  }, [isCompleted]);
+  // ------------------------------------------------
+
   return (
     <div className="min-h-screen bg-stone-100 p-2 md:p-4 font-sans text-gray-800 flex flex-col items-center justify-center">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-stone-200">
@@ -1075,7 +1089,23 @@ export default function App() {
             </div>
           )}
 
-          <div className="flex flex-row items-center justify-center gap-3 w-full mb-2">
+          {/* 加入 relative 讓外層區塊成為絕對定位的基準點 */}
+          <div className="flex flex-row items-center justify-center gap-3 w-full mb-2 relative">
+            
+            {/* 新增：錯誤回饋圖示 (改在文字框右邊) */}
+            {feedback === 'error' && (
+              <div className="absolute right-0 md:-right-2 top-1/2 -translate-y-1/2 z-[60] pointer-events-none">
+                <img src="https://raw.githubusercontent.com/aday0123/stroke-order-app/refs/heads/main/wrong.gif" alt="錯誤" className="w-24 h-24 object-contain drop-shadow-xl" />
+              </div>
+            )}
+
+            {/* 新增：完成回饋圖示 (改在文字框右邊，並改用 showSuccessGif 控制) */}
+            {showSuccessGif && (
+              <div className="absolute right-0 md:-right-2 top-1/2 -translate-y-1/2 z-[60] pointer-events-none">
+                <img src="https://raw.githubusercontent.com/aday0123/stroke-order-app/refs/heads/main/right.gif" alt="完成" className="w-32 h-32 object-contain drop-shadow-xl" />
+              </div>
+            )}
+
             <div 
               className={`relative w-[280px] h-[280px] shrink-0 border-4 ${
                   (mode === 'puzzle' && selectedPiece !== null) || (mode === 'component' && selectedComp !== null) 
@@ -1124,23 +1154,10 @@ export default function App() {
                  </div>
               )}
 
+              {/* （原有的遮罩與 GIF 已經被我們移除，直接接續這段提示即可） */}
               {feedback === 'error' && (
                 <div className="absolute top-2 right-2 z-30 bg-rose-500 text-white text-xs font-bold px-2 py-1 rounded shadow-md animate-bounce">
                   {mode === 'puzzle' || mode === 'component' ? '位置不對喔！' : '寫錯囉！注意起點'}
-                </div>
-              )}
-
-              {/* 新增：錯誤回饋圖示 (全螢幕覆蓋於畫布上) */}
-              {feedback === 'error' && (
-                <div className="absolute inset-0 flex items-center justify-center z-[60] pointer-events-none">
-                  <img src="https://raw.githubusercontent.com/aday0123/stroke-order-app/refs/heads/main/wrong.gif" alt="錯誤" className="w-32 h-32 object-contain drop-shadow-xl" />
-                </div>
-              )}
-
-              {/* 新增：完成回饋圖示 (全螢幕覆蓋於畫布上) */}
-              {isCompleted && (
-                <div className="absolute inset-0 flex items-center justify-center z-[50] pointer-events-none bg-white/40 rounded-md backdrop-blur-[2px]">
-                  <img src="https://raw.githubusercontent.com/aday0123/stroke-order-app/refs/heads/main/right.gif" alt="完成" className="w-48 h-48 object-contain drop-shadow-2xl" />
                 </div>
               )}
 
