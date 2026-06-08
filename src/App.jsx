@@ -848,7 +848,7 @@ export default function App() {
     setWrongComp(null);
     setErrorCount(0);
     if (newMode === 'practice') setCurrentStrokeNum(0); 
-    else if (newMode === 'play') setCurrentStrokeNum(strokesData.length); 
+    else if (newMode === 'play') setCurrentStrokeNum(0); 
   };
 
   const getComponentCenter = (group) => {
@@ -923,7 +923,7 @@ export default function App() {
       if (targetMedian && targetMedian.length > 0) {
         ctx.beginPath(); ctx.moveTo(targetMedian[0].x, targetMedian[0].y);
         for (let i = 1; i < targetMedian.length; i++) ctx.lineTo(targetMedian[i].x, targetMedian[i].y);
-        ctx.strokeStyle = '#fca5a5'; ctx.lineWidth = 15; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.stroke();
+        ctx.strokeStyle = '#fca5a5'; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.stroke();
         ctx.beginPath(); ctx.arc(targetMedian[0].x, targetMedian[0].y, 6, 0, Math.PI * 2); ctx.fillStyle = '#ef4444'; ctx.fill();
       }
     }
@@ -931,7 +931,7 @@ export default function App() {
     if (userPath.length > 0) {
       ctx.beginPath(); ctx.moveTo(userPath[0].x, userPath[0].y);
       for (let i = 1; i < userPath.length; i++) ctx.lineTo(userPath[i].x, userPath[i].y);
-      ctx.strokeStyle = feedback === 'error' ? '#ef4444' : '#3b82f6'; ctx.lineWidth = 12; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.stroke();
+      ctx.strokeStyle = feedback === 'error' ? '#ef4444' : '#000000'; ctx.lineWidth = 12; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.stroke();
     }
   }, [strokesData, currentStrokeNum, showOutline, mode, userPath, feedback, showHint, hiddenStrokes, placedStrokes, placedComps, componentGroups]);
 
