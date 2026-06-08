@@ -1039,6 +1039,12 @@ export default function App() {
 
   const displayNumComps = Math.min(numComps, Math.max(1, currentStrokesCount));
 
+  // 判斷各個模式是否過關
+  const isPracticeCompleted = mode === 'practice' && currentStrokeNum === strokesData.length && strokesData.length > 0 && !isLoading;
+  const isPuzzleCompleted = mode === 'puzzle' && hiddenStrokes.length > 0 && placedStrokes.length === hiddenStrokes.length && !isLoading;
+  const isComponentCompleted = mode === 'component' && componentGroups.length > 0 && placedComps.length === componentGroups.length && !isLoading;
+  const isCompleted = isPracticeCompleted || isPuzzleCompleted || isComponentCompleted;
+
   return (
     <div className="min-h-screen bg-stone-100 p-2 md:p-4 font-sans text-gray-800 flex flex-col items-center justify-center">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-stone-200">
@@ -1124,6 +1130,20 @@ export default function App() {
                 </div>
               )}
 
+              {/* 新增：錯誤回饋圖示 (全螢幕覆蓋於畫布上) */}
+              {feedback === 'error' && (
+                <div className="absolute inset-0 flex items-center justify-center z-[60] pointer-events-none">
+                  <img src="https://raw.githubusercontent.com/aday0123/stroke-order-app/refs/heads/main/wrong.gif" alt="錯誤" className="w-32 h-32 object-contain drop-shadow-xl" />
+                </div>
+              )}
+
+              {/* 新增：完成回饋圖示 (全螢幕覆蓋於畫布上) */}
+              {isCompleted && (
+                <div className="absolute inset-0 flex items-center justify-center z-[50] pointer-events-none bg-white/40 rounded-md backdrop-blur-[2px]">
+                  <img src="https://raw.githubusercontent.com/aday0123/stroke-order-app/refs/heads/main/right.gif" alt="完成" className="w-48 h-48 object-contain drop-shadow-2xl" />
+                </div>
+              )}
+
               <canvas ref={canvasRef} width={280} height={280} className={`absolute inset-0 z-10 touch-none select-none ${mode === 'practice' ? 'cursor-crosshair' : ''}`} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerCancel={handlePointerUp} />
             </div>
 
@@ -1204,7 +1224,7 @@ export default function App() {
                   return (
                     <div key={idx}
                       onPointerDown={(e) => {
-                        if (!isExpected) { setWrongPiece(idx); setErrorCount(prev => prev + 1); setTimeout(() => setWrongPiece(null), 500); return; }
+                        if (!isExpected) { setWrongPiece(idx); setFeedback('error'); setErrorCount(prev => prev + 1); setTimeout(() => { setWrongPiece(null); setFeedback(null); }, 500); return; }
                         try { e.currentTarget.setPointerCapture(e.pointerId); } catch(err) {}
                         setDraggingPiece(idx); setSelectedPiece(idx); setDragPos({ x: e.clientX, y: e.clientY });
                       }}
@@ -1231,7 +1251,7 @@ export default function App() {
                         }
                       }}
                       onClick={() => { 
-                        if (!isExpected) { setWrongPiece(idx); setErrorCount(prev => prev + 1); setTimeout(() => setWrongPiece(null), 500); return; }
+                        if (!isExpected) { setWrongPiece(idx); setFeedback('error'); setErrorCount(prev => prev + 1); setTimeout(() => { setWrongPiece(null); setFeedback(null); }, 500); return; }
                         setSelectedPiece(idx === selectedPiece ? null : idx); 
                       }}
                       className={`relative w-14 h-14 border-2 rounded-xl bg-white shadow-sm flex items-center justify-center p-1 transition-all touch-none
@@ -1298,7 +1318,7 @@ export default function App() {
                   return (
                     <div key={compIdx}
                       onPointerDown={(e) => {
-                        if (!isExpected) { setWrongComp(compIdx); setErrorCount(prev => prev + 1); setTimeout(() => setWrongComp(null), 500); return; }
+                        if (!isExpected) { setWrongComp(compIdx); setFeedback('error'); setErrorCount(prev => prev + 1); setTimeout(() => { setWrongComp(null); setFeedback(null); }, 500); return; }
                         try { e.currentTarget.setPointerCapture(e.pointerId); } catch(err) {}
                         setDraggingComp(compIdx); setSelectedComp(compIdx); setDragPos({ x: e.clientX, y: e.clientY });
                       }}
@@ -1320,7 +1340,7 @@ export default function App() {
                         }
                       }}
                       onClick={() => {
-                        if (!isExpected) { setWrongComp(compIdx); setErrorCount(prev => prev + 1); setTimeout(() => setWrongComp(null), 500); return; }
+                        if (!isExpected) { setWrongComp(compIdx); setFeedback('error'); setErrorCount(prev => prev + 1); setTimeout(() => { setWrongComp(null); setFeedback(null); }, 500); return; }
                         setSelectedComp(compIdx === selectedComp ? null : compIdx);
                       }}
                       className={`relative w-14 h-14 border-2 rounded-xl bg-white shadow-sm flex items-center justify-center p-1 transition-all touch-none cursor-pointer hover:bg-slate-50
